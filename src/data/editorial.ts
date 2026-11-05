@@ -1,6 +1,5 @@
 // Datos generales de la editorial. Son de ejemplo hasta tener los reales.
 export const EDITORIAL = {
-  nombre: 'DT5',
   lema: 'Libros que se quedan contigo.',
   descripcion: 'Editorial DT5. Narrativa, ensayo e infantil hechos en México.',
   correo: 'contacto@dt5.mx',
