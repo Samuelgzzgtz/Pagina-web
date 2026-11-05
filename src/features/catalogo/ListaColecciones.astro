@@ -1,0 +1,93 @@
+---
+import { COLECCIONES, type Coleccion } from '../../data/editorial';
+import type { Libro } from './libros';
+
+interface Props {
+  libros: Libro[];
+}
+
+const { libros } = Astro.props;
+const colecciones = Object.entries(COLECCIONES) as [Coleccion, string][];
+const titulos = (n: number) => (n === 1 ? '1 título' : `${n} títulos`);
+---
+
+<ul class="colecciones aparece">
+  {
+    colecciones.map(([clave, nombre], i) => (
+      <li>
+        <a href={`/catalogo/${clave}/`}>
+          <span class="numero">{String(i + 1).padStart(2, '0')}</span>
+          <span class="nombre">{nombre}</span>
+          <span class="cuantos">{titulos(libros.filter((l) => l.data.coleccion === clave).length)}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .colecciones {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--linea);
+  }
+
+  a {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    align-items: center;
+    padding: 18px 14px;
+    border-bottom: 1px solid var(--linea);
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  /* Al pasar el cursor, la fila se llena de azul desde abajo. */
+  a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--azul);
+    transform: translateY(101%);
+    transition: transform 0.35s var(--ease);
+  }
+
+  a:hover::before,
+  a:focus-visible::before {
+    transform: none;
+  }
+
+  a > span {
+    position: relative;
+    transition: color 0.25s;
+  }
+
+  a:hover > span,
+  a:focus-visible > span {
+    color: var(--blanco);
+  }
+
+  .numero {
+    color: var(--naranja-txt);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a:hover .numero,
+  a:focus-visible .numero {
+    color: var(--naranja);
+  }
+
+  .nombre {
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.6vw, 30px);
+    color: var(--azul);
+  }
+
+  .cuantos {
+    color: var(--gris);
+    font-size: 0.875rem;
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import { EDITORIAL } from '../data/editorial';
+
+const principios = [
+  ['Leer primero', 'Cada libro pasa por varias lecturas antes de llegar a la imprenta. Publicamos lo que nos sigue gustando en la quinta.'],
+  ['Hacer libros bien hechos', 'Cuidamos la edición, el papel y la portada. Un libro también es un objeto que se queda en casa.'],
+  ['Llegar a todo el país', 'Nuestros colaboradores llevan los libros a escuelas, librerías y bibliotecas de la República.'],
+];
+---
+
+<Base titulo="Nosotros" descripcion={`Quiénes somos: Editorial DT5, desde ${EDITORIAL.fundacion}.`}>
+  <section class="franja">
+    <h1>Hacemos libros desde {EDITORIAL.fundacion}.</h1>
+    <div class="prosa historia aparece">
+      <p>
+        DT5 nació como un proyecto familiar con una idea sencilla: publicar los libros que nos hubiera gustado leer
+        primero. Empezamos con un par de títulos de narrativa y hoy tenemos colecciones de ensayo, poesía e infantil.
+      </p>
+      <p>
+        Trabajamos de cerca con cada autor, desde el primer manuscrito hasta la presentación del libro, y con una red de
+        colaboradores que acerca nuestro catálogo a lectores de todo México.
+      </p>
+    </div>
+  </section>
+
+  <section class="franja sin-arriba">
+    <ol class="principios">
+      {
+        principios.map(([titulo, texto], i) => (
+          <li class="aparece" style={`--retraso:${i * 80}ms`}>
+            <span class="numero">{String(i + 1).padStart(2, '0')}</span>
+            <h2>{titulo}</h2>
+            <p>{texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+</Base>
+
+<style>
+  h1 {
+    max-width: 16ch;
+    font-size: clamp(40px, 6.4vw, 84px);
+    letter-spacing: -0.035em;
+  }
+
+  .historia {
+    margin-top: clamp(24px, 4vw, 44px);
+  }
+
+  .sin-arriba {
+    padding-top: 0;
+  }
+
+  .principios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: clamp(24px, 4vw, 48px);
+    list-style: none;
+    margin: 0;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--linea);
+  }
+
+  .numero {
+    color: var(--naranja-txt);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .principios h2 {
+    margin-top: 10px;
+    font-size: clamp(24px, 2.4vw, 30px);
+  }
+
+  .principios p {
+    margin: 10px 0 0;
+    color: var(--gris);
+  }
+</style>

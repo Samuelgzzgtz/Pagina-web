@@ -1,0 +1,12 @@
+---
+import VistaCatalogo from '../../features/catalogo/VistaCatalogo.astro';
+import { CLAVES_COLECCION, type Coleccion } from '../../data/editorial';
+
+export function getStaticPaths() {
+  return CLAVES_COLECCION.map((coleccion) => ({ params: { coleccion } }));
+}
+
+const coleccion = Astro.params.coleccion as Coleccion;
+---
+
+<VistaCatalogo coleccion={coleccion} />

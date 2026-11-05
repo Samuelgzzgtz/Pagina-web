@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import { EDITORIAL } from '../data/editorial';
+---
+
+<Base titulo="Aviso de privacidad" descripcion="Aviso de privacidad de Editorial DT5.">
+  <section class="franja">
+    <h1>Aviso de privacidad</h1>
+    <div class="prosa texto">
+      <p>
+        Editorial DT5, con domicilio en {EDITORIAL.ciudad}, es responsable de los datos personales que publica y recibe
+        a través de este sitio.
+      </p>
+      <p>
+        Los nombres, teléfonos y correos de nuestros colaboradores se publican con su autorización, solo para que los
+        lectores, escuelas y librerías puedan contactarlos.
+      </p>
+      <p>
+        Este sitio no tiene formularios ni guarda los datos de quien lo visita. Si nos escribes por correo o WhatsApp,
+        usamos tus datos solo para responderte. Para corregir o borrar tus datos, escríbenos a
+        <a href={`mailto:${EDITORIAL.correo}`}>{EDITORIAL.correo}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  h1 {
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -0.03em;
+  }
+
+  .texto {
+    margin-top: 28px;
+  }
+</style>

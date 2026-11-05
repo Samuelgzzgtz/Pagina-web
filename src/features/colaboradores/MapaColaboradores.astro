@@ -1,0 +1,379 @@
+---
+import { getCollection } from 'astro:content';
+import Icono from '../../components/Icono.astro';
+import { EDITORIAL } from '../../data/editorial';
+import { ESTADOS, type ClaveEstado } from '../../data/estados';
+// Mapa de dominio público: "Mexico template.svg" de Wikimedia Commons. Cada trazo tiene la clave del estado como id.
+import mapaSvg from './mapa-mexico.svg?raw';
+import type { Contacto, DatosMapa } from './tipos';
+
+interface Props {
+  titulo?: string;
+  // En la página Colaboradores el título es el h1; en Inicio es una sección más.
+  principal?: boolean;
+}
+
+const { titulo = 'Encuentra a tu colaborador', principal = false } = Astro.props;
+const Titulo = principal ? 'h1' : 'h2';
+
+const colaboradores = await getCollection('colaboradores');
+const red: Partial<Record<ClaveEstado, Contacto[]>> = {};
+for (const { data } of colaboradores) {
+  (red[data.estado] ??= []).push(data);
+}
+
+const central: Contacto = {
+  nombre: 'Oficina central DT5',
+  zona: EDITORIAL.ciudad,
+  telefono: EDITORIAL.telefono,
+  correo: EDITORIAL.correo,
+  whatsapp: true,
+};
+
+const opciones = (Object.entries(ESTADOS) as [ClaveEstado, string][]).sort((a, b) => a[1].localeCompare(b[1], 'es'));
+const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" aria-hidden="true" focusable="false"');
+---
+
+<mapa-colaboradores class="red">
+  <div class="mapa">
+    <Titulo class="titulo-seccion">{titulo}</Titulo>
+    <p class="lead">Toca tu estado para ver quién te atiende y llamarle o escribirle.</p>
+    <div class="lienzo aparece" data-lienzo set:html={svg} />
+    <p class="leyenda">
+      <span><i class="si"></i>Con colaborador</span>
+      <span><i></i>Te atiende la oficina central</span>
+    </p>
+  </div>
+
+  <div class="panel">
+    <label for="estado">Estado</label>
+    <div class="selector">
+      <select id="estado" data-selector>
+        <option value="">Elige tu estado</option>
+        {
+          opciones.map(([clave, nombre]) => (
+            <option value={clave}>
+              {nombre}
+              {red[clave] ? '' : ' (oficina central)'}
+            </option>
+          ))
+        }
+      </select>
+      <Icono nombre="abajo" />
+    </div>
+    <div class="resultado" data-resultado aria-live="polite">
+      <p class="vacio">Elige un estado en el mapa o en la lista para ver a quién contactar.</p>
+    </div>
+  </div>
+
+  <div class="tip" data-tip aria-hidden="true"></div>
+
+  <template data-plantilla>
+    <div class="persona">
+      <p class="nombre" data-campo="nombre"></p>
+      <p class="zona" data-campo="zona"></p>
+      <div class="acciones">
+        <a class="boton chico" data-campo="llamar"><Icono nombre="telefono" /><span data-campo="telefono"></span></a>
+        <a class="boton chico borde" data-campo="whatsapp" target="_blank" rel="noopener"
+          ><Icono nombre="whatsapp" />WhatsApp</a
+        >
+        <a class="boton chico borde" data-campo="correo"><Icono nombre="correo" />Correo</a>
+      </div>
+    </div>
+  </template>
+
+  <script type="application/json" data-red set:html={JSON.stringify({ red, central, estados: ESTADOS } satisfies DatosMapa)} />
+</mapa-colaboradores>
+
+<script>
+  import { enlaceLlamada, enlaceWhatsApp, formatearTelefono } from '../../data/telefono';
+  import type { ClaveEstado } from '../../data/estados';
+  import type { Contacto, DatosMapa } from './tipos';
+
+  class MapaColaboradores extends HTMLElement {
+    connectedCallback() {
+      const datos: DatosMapa = JSON.parse(this.querySelector('[data-red]')!.textContent!);
+      const lienzo = this.querySelector<HTMLElement>('[data-lienzo]')!;
+      const selector = this.querySelector<HTMLSelectElement>('[data-selector]')!;
+      const resultado = this.querySelector<HTMLElement>('[data-resultado]')!;
+      const plantilla = this.querySelector<HTMLTemplateElement>('[data-plantilla]')!;
+      const tip = this.querySelector<HTMLElement>('[data-tip]')!;
+      const trazos = [...lienzo.querySelectorAll<SVGPathElement>('path')];
+      const cuantos = (n: number) => (n === 1 ? '1 colaborador' : `${n} colaboradores`);
+
+      const persona = (c: Contacto) => {
+        const nodo = plantilla.content.cloneNode(true) as DocumentFragment;
+        const campo = (n: string) => nodo.querySelector<HTMLElement>(`[data-campo="${n}"]`)!;
+        campo('nombre').textContent = c.nombre;
+        campo('zona').textContent = c.zona;
+        campo('telefono').textContent = formatearTelefono(c.telefono);
+        campo('llamar').setAttribute('href', enlaceLlamada(c.telefono));
+        campo('correo').setAttribute('href', `mailto:${c.correo}`);
+        if (c.whatsapp) {
+          campo('whatsapp').setAttribute('href', enlaceWhatsApp(c.telefono, `Hola ${c.nombre}, te escribo desde la página de DT5.`));
+        } else campo('whatsapp').remove();
+        return nodo;
+      };
+
+      const elegir = (clave: ClaveEstado, desdeMapa = false) => {
+        selector.value = clave;
+        for (const t of trazos) t.classList.toggle('elegido', t.id === clave);
+        // Se dibuja al final para que su borde quede por encima de los vecinos.
+        const trazo = trazos.find((t) => t.id === clave);
+        trazo?.parentNode?.appendChild(trazo);
+
+        const gente = datos.red[clave];
+        const titulo = document.createElement('h3');
+        titulo.textContent = datos.estados[clave];
+        const conteo = document.createElement('p');
+        conteo.className = 'conteo';
+        conteo.textContent = gente ? cuantos(gente.length) : 'Aún no tenemos colaborador aquí. Te atiende la oficina central.';
+        resultado.replaceChildren(titulo, conteo, ...(gente ?? [datos.central]).map(persona));
+        resultado.classList.remove('cambia');
+        void resultado.offsetWidth;
+        resultado.classList.add('cambia');
+
+        if (desdeMapa && resultado.getBoundingClientRect().top > innerHeight - 120) {
+          resultado.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      };
+
+      trazos.forEach((t, i) => {
+        t.style.setProperty('--i', String(i));
+        if (datos.red[t.id as ClaveEstado]) t.classList.add('si');
+        t.addEventListener('click', () => elegir(t.id as ClaveEstado, true));
+        t.addEventListener('pointermove', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          const caja = this.getBoundingClientRect();
+          const gente = datos.red[t.id as ClaveEstado];
+          tip.textContent = datos.estados[t.id as ClaveEstado] + (gente ? ` · ${cuantos(gente.length)}` : '');
+          tip.style.translate = `${e.clientX - caja.left}px ${e.clientY - caja.top}px`;
+          tip.classList.add('ver');
+        });
+        t.addEventListener('pointerleave', () => tip.classList.remove('ver'));
+      });
+
+      selector.addEventListener('change', () => selector.value && elegir(selector.value as ClaveEstado));
+    }
+  }
+
+  customElements.define('mapa-colaboradores', MapaColaboradores);
+</script>
+
+<style>
+  .red {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+
+  .lienzo {
+    margin-top: 20px;
+  }
+
+  .lienzo :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .lienzo :global(path) {
+    fill: var(--sin);
+    stroke: var(--papel);
+    stroke-width: 1.2;
+    cursor: pointer;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      fill 0.25s,
+      transform 0.3s var(--ease);
+  }
+
+  /* El mapa "se arma" estado por estado cuando entra en pantalla. */
+  .lienzo.visible :global(path) {
+    animation: arma 0.5s var(--ease) both;
+    animation-delay: calc(var(--i) * 18ms);
+  }
+
+  @keyframes arma {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+
+  .lienzo :global(path.si) {
+    fill: var(--azul);
+  }
+
+  @media (hover: hover) {
+    .lienzo :global(path:hover) {
+      fill: #b9c1da;
+    }
+
+    .lienzo :global(path.si:hover) {
+      fill: var(--azul-2);
+    }
+  }
+
+  .lienzo :global(path.elegido) {
+    fill: var(--naranja) !important;
+    transform: scale(1.04);
+    animation: elige 0.35s var(--ease) both !important;
+  }
+
+  @keyframes elige {
+    from {
+      transform: scale(1);
+    }
+  }
+
+  .leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin: 14px 0 0;
+    font-size: 0.875rem;
+    color: var(--gris);
+  }
+
+  .leyenda i {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 7px;
+    border-radius: 2px;
+    background: var(--sin);
+    vertical-align: -1px;
+  }
+
+  .leyenda i.si {
+    background: var(--azul);
+  }
+
+  .panel {
+    padding-top: 8px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--azul);
+  }
+
+  .selector {
+    position: relative;
+  }
+
+  select {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 44px 0 14px;
+    border: 1.5px solid #1b2f6b55;
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--tinta);
+    font: inherit;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  select:hover {
+    border-color: var(--azul);
+  }
+
+  .selector :global(svg) {
+    position: absolute;
+    right: 14px;
+    top: 16px;
+    color: var(--azul);
+    pointer-events: none;
+  }
+
+  .resultado {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--linea);
+    scroll-margin-bottom: 24px;
+  }
+
+  .resultado.cambia {
+    animation: entra 0.3s var(--ease);
+  }
+
+  .vacio {
+    margin: 0;
+    color: var(--gris);
+  }
+
+  .resultado :global(h3) {
+    font-size: clamp(26px, 3vw, 32px);
+  }
+
+  .resultado :global(.conteo) {
+    margin: 4px 0 12px;
+    color: var(--gris);
+    font-size: 0.9375rem;
+  }
+
+  .resultado :global(.persona) {
+    padding: 16px 0;
+    border-top: 1px solid #1b2f6b1a;
+  }
+
+  .resultado :global(.conteo + .persona) {
+    border-top: 0;
+    padding-top: 4px;
+  }
+
+  .resultado :global(.nombre) {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+
+  .resultado :global(.zona) {
+    margin: 0;
+    color: var(--gris);
+    font-size: 0.9375rem;
+  }
+
+  .resultado :global(.acciones) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--tinta);
+    color: var(--blanco);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 12px));
+    transition: opacity 0.15s;
+  }
+
+  .tip.ver {
+    opacity: 1;
+  }
+
+  @media (max-width: 760px) {
+    .red {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

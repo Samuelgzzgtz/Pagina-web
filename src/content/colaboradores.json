@@ -1,0 +1,98 @@
+[
+  {
+    "id": "sofia.garza",
+    "estado": "NLE",
+    "nombre": "Sofía Garza",
+    "zona": "Monterrey y área metropolitana",
+    "telefono": "8112345678",
+    "correo": "sofia.garza@dt5.mx"
+  },
+  {
+    "id": "ricardo.nunez",
+    "estado": "JAL",
+    "nombre": "Ricardo Núñez",
+    "zona": "Guadalajara",
+    "telefono": "3323456789",
+    "correo": "ricardo.nunez@dt5.mx"
+  },
+  {
+    "id": "daniela.ortiz",
+    "estado": "CMX",
+    "nombre": "Daniela Ortiz",
+    "zona": "Escuelas y librerías",
+    "telefono": "5534567890",
+    "correo": "daniela.ortiz@dt5.mx"
+  },
+  {
+    "id": "emilio.torres",
+    "estado": "CMX",
+    "nombre": "Emilio Torres",
+    "zona": "Bibliotecas e instituciones",
+    "telefono": "5545678901",
+    "correo": "emilio.torres@dt5.mx"
+  },
+  {
+    "id": "jorge.mendez",
+    "estado": "PUE",
+    "nombre": "Jorge Méndez",
+    "zona": "Puebla y Tlaxcala",
+    "telefono": "2225678901",
+    "correo": "jorge.mendez@dt5.mx"
+  },
+  {
+    "id": "valeria.canul",
+    "estado": "YUC",
+    "nombre": "Valeria Canul",
+    "zona": "Península de Yucatán",
+    "telefono": "9996789012",
+    "correo": "valeria.canul@dt5.mx"
+  },
+  {
+    "id": "andres.lozano",
+    "estado": "BCN",
+    "nombre": "Andrés Lozano",
+    "zona": "Tijuana y Mexicali",
+    "telefono": "6647890123",
+    "correo": "andres.lozano@dt5.mx"
+  },
+  {
+    "id": "paola.rios",
+    "estado": "CHI",
+    "nombre": "Paola Ríos",
+    "zona": "Chihuahua y Ciudad Juárez",
+    "telefono": "6148901234",
+    "correo": "paola.rios@dt5.mx"
+  },
+  {
+    "id": "luis.herrera",
+    "estado": "VER",
+    "nombre": "Luis Herrera",
+    "zona": "Xalapa y Veracruz",
+    "telefono": "2289012345",
+    "correo": "luis.herrera@dt5.mx"
+  },
+  {
+    "id": "mariana.sanchez",
+    "estado": "QRO",
+    "nombre": "Mariana Sánchez",
+    "zona": "Querétaro",
+    "telefono": "4420123456",
+    "correo": "mariana.sanchez@dt5.mx"
+  },
+  {
+    "id": "hector.felix",
+    "estado": "SIN",
+    "nombre": "Héctor Félix",
+    "zona": "Culiacán y Mazatlán",
+    "telefono": "6671122334",
+    "correo": "hector.felix@dt5.mx"
+  },
+  {
+    "id": "fernanda.aguirre",
+    "estado": "COA",
+    "nombre": "Fernanda Aguirre",
+    "zona": "Saltillo y Torreón",
+    "telefono": "8442233445",
+    "correo": "fernanda.aguirre@dt5.mx"
+  }
+]
