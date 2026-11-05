@@ -16,7 +16,7 @@ const { libros, fila = false } = Astro.props;
     libros.map((libro, i) => (
       <li class="aparece" style={`--retraso:${(i % 4) * 70}ms`}>
         <a href={`/libros/${libro.id}/`}>
-          <Portada libro={libro} />
+          <Portada libro={libro} decorativa />
           <span class="titulo">{libro.data.titulo}</span>
           <span class="autor">{libro.autor.data.nombre}</span>
         </a>

@@ -47,11 +47,10 @@ const titulo = coleccion ? COLECCIONES[coleccion] : 'Catálogo';
 
   .filtros {
     display: flex;
-    gap: clamp(18px, 3vw, 32px);
+    flex-wrap: wrap;
+    gap: 0 clamp(18px, 3vw, 32px);
     margin: 20px 0 clamp(28px, 4vw, 44px);
     border-bottom: 1px solid var(--linea);
-    overflow-x: auto;
-    scrollbar-width: none;
   }
 
   .filtros a {

@@ -9,10 +9,12 @@ interface Props {
   // Debe ser único por página, así que se apaga en portadas repetidas.
   transicion?: boolean;
   ancho?: number;
+  // Dentro de un enlace que ya dice el título, para que el lector de pantalla no lo repita.
+  decorativa?: boolean;
   class?: string;
 }
 
-const { libro, transicion = true, ancho = 320, class: clase } = Astro.props;
+const { libro, transicion = true, ancho = 320, decorativa = false, class: clase } = Astro.props;
 const { titulo, coleccion, color, portada } = libro.data;
 const nombre = transicion ? `portada-${libro.id}` : undefined;
 ---
@@ -22,7 +24,7 @@ const nombre = transicion ? `portada-${libro.id}` : undefined;
     <Image
       class:list={['portada', 'foto', clase]}
       src={portada}
-      alt={`Portada de ${titulo}`}
+      alt={decorativa ? '' : `Portada de ${titulo}`}
       width={ancho}
       style={nombre && `view-transition-name:${nombre}`}
     />
@@ -30,8 +32,9 @@ const nombre = transicion ? `portada-${libro.id}` : undefined;
     <div
       class:list={['portada', color, clase]}
       style={nombre && `view-transition-name:${nombre}`}
-      role="img"
-      aria-label={`Portada de ${titulo}`}
+      role={decorativa ? undefined : 'img'}
+      aria-label={decorativa ? undefined : `Portada de ${titulo}`}
+      aria-hidden={decorativa ? 'true' : undefined}
     >
       <div class="cara">
         <small>{COLECCIONES[coleccion]}</small>

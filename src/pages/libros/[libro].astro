@@ -30,7 +30,6 @@ const { libro, relacionados } = Astro.props;
 const { titulo, coleccion, anio, paginas, isbn } = libro.data;
 const { Content } = await render(libro);
 const datos = [
-  ['Colección', COLECCIONES[coleccion]],
   ['Año', String(anio)],
   ['Páginas', paginas && String(paginas)],
   ['ISBN', isbn],
@@ -97,6 +96,9 @@ const pedido = `Hola, me interesa el libro "${titulo}" de ${libro.autor.data.nom
   }
 
   .coleccion {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: var(--naranja-txt);
     font-weight: 600;
     font-size: 0.9375rem;
@@ -104,7 +106,7 @@ const pedido = `Hola, me interesa el libro "${titulo}" de ${libro.autor.data.nom
   }
 
   h1 {
-    margin-top: 10px;
+    margin-top: 2px;
     font-size: clamp(38px, 5.4vw, 68px);
     letter-spacing: -0.03em;
   }
@@ -163,7 +165,7 @@ const pedido = `Hola, me interesa el libro "${titulo}" de ${libro.autor.data.nom
 
     .ficha-portada {
       position: static;
-      width: min(70%, 300px);
+      width: min(55%, 220px);
     }
   }
 </style>

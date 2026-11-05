@@ -86,7 +86,7 @@ const cifras = [
   <section class="franja llamado">
     <div>
       <h2 class="titulo-seccion">¿Tienes un manuscrito?</h2>
-      <p>Leemos todas las propuestas. Te respondemos en 8 semanas.</p>
+      <p>Leemos todas las propuestas. Te respondemos en un máximo de 8 semanas.</p>
     </div>
     <a class="boton" href="/publica/">Envía tu obra <Icono nombre="flecha" /></a>
   </section>
@@ -108,7 +108,7 @@ const cifras = [
   }
 
   h1 em {
-    color: var(--naranja);
+    color: var(--naranja-txt);
   }
 
   .linea {
@@ -256,6 +256,9 @@ const cifras = [
   }
 
   .nombres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px clamp(20px, 3vw, 36px);
     margin: 0;
     font-family: var(--serif);
     font-size: clamp(22px, 2.6vw, 32px);
@@ -264,6 +267,9 @@ const cifras = [
   }
 
   .nombres a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     white-space: nowrap;
     text-decoration: none;
     transition: color 0.2s;
@@ -271,17 +277,6 @@ const cifras = [
 
   .nombres a:hover {
     color: var(--naranja-txt);
-  }
-
-  .nombres a + a::before {
-    content: '';
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin: 0 14px 0 12px;
-    border-radius: 50%;
-    background: var(--naranja);
-    vertical-align: middle;
   }
 
   .llamado {

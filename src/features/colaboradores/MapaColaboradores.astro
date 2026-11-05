@@ -31,13 +31,15 @@ const central: Contacto = {
 };
 
 const opciones = (Object.entries(ESTADOS) as [ClaveEstado, string][]).sort((a, b) => a[1].localeCompare(b[1], 'es'));
+// Escapa "<" para que un nombre con "</script>" no rompa la página.
+const datos = JSON.stringify({ red, central, estados: ESTADOS } satisfies DatosMapa).replace(/</g, '\\u003c');
 const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" aria-hidden="true" focusable="false"');
 ---
 
-<mapa-colaboradores class="red">
+<mapa-colaboradores class="red" data-nivel={principal ? 'h2' : 'h3'}>
   <div class="mapa">
     <Titulo class="titulo-seccion">{titulo}</Titulo>
-    <p class="lead">Toca tu estado para ver quién te atiende y llamarle o escribirle.</p>
+    <p class="lead">Elige tu estado en el mapa o en la lista para ver quién te atiende y llamarle o escribirle.</p>
     <div class="lienzo aparece" data-lienzo set:html={svg} />
     <p class="leyenda">
       <span><i class="si"></i>Con colaborador</span>
@@ -49,7 +51,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
     <label for="estado">Estado</label>
     <div class="selector">
       <select id="estado" data-selector>
-        <option value="">Elige tu estado</option>
+        <option value="" disabled selected>Elige tu estado</option>
         {
           opciones.map(([clave, nombre]) => (
             <option value={clave}>
@@ -82,7 +84,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
     </div>
   </template>
 
-  <script type="application/json" data-red set:html={JSON.stringify({ red, central, estados: ESTADOS } satisfies DatosMapa)} />
+  <script type="application/json" data-red set:html={datos} />
 </mapa-colaboradores>
 
 <script>
@@ -117,13 +119,15 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
 
       const elegir = (clave: ClaveEstado, desdeMapa = false) => {
         selector.value = clave;
+        // Desde la primera elección el mapa ya no repite la animación de entrada.
+        lienzo.classList.add('listo');
         for (const t of trazos) t.classList.toggle('elegido', t.id === clave);
         // Se dibuja al final para que su borde quede por encima de los vecinos.
         const trazo = trazos.find((t) => t.id === clave);
         trazo?.parentNode?.appendChild(trazo);
 
         const gente = datos.red[clave];
-        const titulo = document.createElement('h3');
+        const titulo = document.createElement(this.dataset.nivel ?? 'h3');
         titulo.textContent = datos.estados[clave];
         const conteo = document.createElement('p');
         conteo.className = 'conteo';
@@ -153,7 +157,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
         t.addEventListener('pointerleave', () => tip.classList.remove('ver'));
       });
 
-      selector.addEventListener('change', () => selector.value && elegir(selector.value as ClaveEstado));
+      selector.addEventListener('change', () => elegir(selector.value as ClaveEstado));
     }
   }
 
@@ -193,7 +197,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
   }
 
   /* El mapa "se arma" estado por estado cuando entra en pantalla. */
-  .lienzo.visible :global(path) {
+  .lienzo.visible:not(.listo) :global(path) {
     animation: arma 0.5s var(--ease) both;
     animation-delay: calc(var(--i) * 18ms);
   }
@@ -211,7 +215,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
 
   @media (hover: hover) {
     .lienzo :global(path:hover) {
-      fill: #b9c1da;
+      fill: #aeb8d4;
     }
 
     .lienzo :global(path.si:hover) {
@@ -222,13 +226,6 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
   .lienzo :global(path.elegido) {
     fill: var(--naranja) !important;
     transform: scale(1.04);
-    animation: elige 0.35s var(--ease) both !important;
-  }
-
-  @keyframes elige {
-    from {
-      transform: scale(1);
-    }
   }
 
   .leyenda {
@@ -247,6 +244,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
     margin-right: 7px;
     border-radius: 2px;
     background: var(--sin);
+    box-shadow: inset 0 0 0 1px #1b2f6b40;
     vertical-align: -1px;
   }
 

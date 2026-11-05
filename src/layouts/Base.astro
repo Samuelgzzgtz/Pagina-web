@@ -39,6 +39,8 @@ const anio = new Date().getFullYear();
     <meta property="og:description" content={descripcion} />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#f6f1e7" />
+    <!-- Quitar cuando los libros, autores y teléfonos sean reales. -->
+    <meta name="robots" content="noindex" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <script is:inline>document.documentElement.classList.add('js')</script>
@@ -112,10 +114,8 @@ const anio = new Date().getFullYear();
           <li><a href={`mailto:${EDITORIAL.correo}`}>{EDITORIAL.correo}</a></li>
           <li><a href={enlaceLlamada(EDITORIAL.telefono)}>{formatearTelefono(EDITORIAL.telefono)}</a></li>
           <li><a href={enlaceWhatsApp(EDITORIAL.telefono)} rel="noopener" target="_blank">WhatsApp</a></li>
-          <li>
-            <a href={EDITORIAL.redes.instagram} rel="noopener" target="_blank">Instagram</a>,
-            <a href={EDITORIAL.redes.facebook} rel="noopener" target="_blank">Facebook</a>
-          </li>
+          <li><a href={EDITORIAL.redes.instagram} rel="noopener" target="_blank">Instagram</a></li>
+          <li><a href={EDITORIAL.redes.facebook} rel="noopener" target="_blank">Facebook</a></li>
         </ul>
       </div>
       <p class="pie-legal">© {anio} Editorial DT5. <a href="/privacidad/">Aviso de privacidad</a></p>
@@ -274,6 +274,10 @@ const anio = new Date().getFullYear();
     }
   }
 
+  .menu-movil :focus-visible {
+    outline-color: var(--blanco);
+  }
+
   .menu-movil::backdrop {
     background: transparent;
   }
@@ -353,8 +357,9 @@ const anio = new Date().getFullYear();
 
   .pie li a,
   .pie-legal a {
-    display: inline-block;
-    padding: 5px 0;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     text-decoration: none;
   }
 
