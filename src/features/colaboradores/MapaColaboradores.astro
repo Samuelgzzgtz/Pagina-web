@@ -128,6 +128,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
 
         const gente = datos.red[clave];
         const titulo = document.createElement(this.dataset.nivel ?? 'h3');
+        titulo.className = 'estado';
         titulo.textContent = datos.estados[clave];
         const conteo = document.createElement('p');
         conteo.className = 'conteo';
@@ -309,7 +310,7 @@ const svg = mapaSvg.replace('viewBox="0 0 976 655"', 'viewBox="-6 -6 988 667" ar
     color: var(--gris);
   }
 
-  .resultado :global(h3) {
+  .resultado :global(.estado) {
     font-size: clamp(26px, 3vw, 32px);
   }
 
