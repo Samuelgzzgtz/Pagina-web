@@ -119,6 +119,7 @@ const anio = new Date().getFullYear();
         </ul>
       </div>
       <p class="pie-legal">© {anio} Editorial DT5. <a href="/privacidad/">Aviso de privacidad</a></p>
+      <p class="pie-firma aparece" aria-hidden="true">DT<b>5</b></p>
     </footer>
 
     <script>
@@ -332,10 +333,11 @@ const anio = new Date().getFullYear();
   }
 
   .pie {
+    overflow: hidden;
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr;
     gap: 32px;
-    padding: 56px var(--orilla) 28px;
+    padding: 56px var(--orilla) 0;
     border-top: 1px solid var(--linea);
     color: var(--gris);
     font-size: 0.9375rem;
@@ -377,6 +379,25 @@ const anio = new Date().getFullYear();
     padding-top: 20px;
     border-top: 1px solid #1b2f6b1a;
     font-size: 0.875rem;
+  }
+
+  /* Firma grande que asoma cortada al final de cada página. */
+  .pie-firma {
+    grid-column: 1 / -1;
+    margin: clamp(24px, 4vw, 48px) 0 calc(-0.24 * clamp(120px, 27vw, 400px));
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(120px, 27vw, 400px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--azul);
+    text-align: center;
+    user-select: none;
+  }
+
+  .pie-firma b {
+    color: var(--naranja);
+    font-weight: inherit;
   }
 
   @media (max-width: 640px) {

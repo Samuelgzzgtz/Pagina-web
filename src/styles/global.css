@@ -1,6 +1,7 @@
-@import '@fontsource-variable/fraunces/opsz.css';
-@import '@fontsource-variable/fraunces/wght-italic.css';
-@import '@fontsource-variable/inter-tight/wght.css';
+/* Newsreader con tamaño óptico: fina en títulos grandes y firme en tamaños chicos. */
+@import '@fontsource-variable/newsreader/opsz.css';
+@import '@fontsource-variable/newsreader/opsz-italic.css';
+@import '@fontsource-variable/inter/wght.css';
 
 :root {
   --azul: #1b2f6b;
@@ -14,8 +15,8 @@
   --gris: #5b6275;
   --linea: #1b2f6b33;
   --sin: #c9d0e3;
-  --serif: 'Fraunces Variable', Georgia, serif;
-  --sans: 'Inter Tight Variable', system-ui, sans-serif;
+  --serif: 'Newsreader Variable', Georgia, serif;
+  --sans: 'Inter Variable', system-ui, sans-serif;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ancho: 1200px;
   --margen: clamp(20px, 4vw, 32px);
@@ -43,7 +44,7 @@ body {
   color: var(--tinta);
   font-family: var(--sans);
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -53,8 +54,8 @@ h3,
 h4 {
   font-family: var(--serif);
   font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
   color: var(--azul);
   margin: 0;
   text-wrap: balance;

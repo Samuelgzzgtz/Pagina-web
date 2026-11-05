@@ -5,12 +5,15 @@ import Icono from '../components/Icono.astro';
 import Portada from '../features/catalogo/Portada.astro';
 import ListaLibros from '../features/catalogo/ListaLibros.astro';
 import ListaColecciones from '../features/catalogo/ListaColecciones.astro';
+import LibroDestacado from '../features/catalogo/LibroDestacado.astro';
 import { obtenerLibros } from '../features/catalogo/libros';
 import MapaColaboradores from '../features/colaboradores/MapaColaboradores.astro';
 import { EDITORIAL } from '../data/editorial';
 
 const libros = await obtenerLibros();
-const novedades = libros.filter((l) => l.data.novedad).slice(0, 4);
+const novedades = libros.filter((l) => l.data.novedad);
+const [destacado] = novedades;
+const recientes = libros.filter((l) => l !== destacado).slice(0, 4);
 const autores = (await getCollection('autores')).sort((a, b) => a.data.nombre.localeCompare(b.data.nombre, 'es'));
 const estadosConColaborador = new Set((await getCollection('colaboradores')).map((c) => c.data.estado)).size;
 
@@ -45,7 +48,8 @@ const cifras = [
       <h2 class="titulo-seccion">Novedades</h2>
       <a class="enlace" href="/catalogo/">Todo el catálogo <Icono nombre="flecha" tamano={16} /></a>
     </div>
-    <ListaLibros libros={novedades} fila />
+    {destacado && <LibroDestacado libro={destacado} />}
+    <ListaLibros libros={recientes} fila />
   </section>
 
   <section class="franja sin-arriba">
@@ -62,7 +66,7 @@ const cifras = [
         cifras.map((c) => (
           <div>
             <dt>{c.texto}</dt>
-            <dd>{c.valor}</dd>
+            <dd data-contar={c.valor}>{c.valor}</dd>
           </div>
         ))
       }
@@ -91,6 +95,28 @@ const cifras = [
     <a class="boton" href="/publica/">Envía tu obra <Icono nombre="flecha" /></a>
   </section>
 </Base>
+
+<script>
+  // Las cifras cuentan desde cero la primera vez que se ven. Sin movimiento reducido.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const cifras = document.querySelectorAll<HTMLElement>('[data-contar]');
+    const observador = new IntersectionObserver((entradas) => {
+      for (const { target, isIntersecting } of entradas) {
+        if (!isIntersecting) continue;
+        observador.unobserve(target);
+        const meta = Number((target as HTMLElement).dataset.contar);
+        const inicio = performance.now();
+        const paso = (ahora: number) => {
+          const avance = Math.min((ahora - inicio) / 1100, 1);
+          target.textContent = String(Math.round(meta * (1 - (1 - avance) ** 3)));
+          if (avance < 1) requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
+      }
+    });
+    cifras.forEach((c) => observador.observe(c));
+  }
+</script>
 
 <style>
   .portada-inicio {

@@ -14,3 +14,7 @@ export async function obtenerLibros(): Promise<Libro[]> {
     })
     .sort((a, b) => b.data.anio - a.data.anio || a.data.titulo.localeCompare(b.data.titulo, 'es'));
 }
+
+// Mensaje que se precarga al pedir un libro por WhatsApp o correo.
+export const mensajePedido = (libro: Libro) =>
+  `Hola, me interesa el libro "${libro.data.titulo}" de ${libro.autor.data.nombre}.`;

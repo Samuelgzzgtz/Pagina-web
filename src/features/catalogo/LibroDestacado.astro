@@ -1,0 +1,125 @@
+---
+import { render } from 'astro:content';
+import Icono from '../../components/Icono.astro';
+import Portada from './Portada.astro';
+import { mensajePedido, type Libro } from './libros';
+import { COLECCIONES, EDITORIAL } from '../../data/editorial';
+import { enlaceWhatsApp } from '../../data/telefono';
+
+interface Props {
+  libro: Libro;
+}
+
+const { libro } = Astro.props;
+const { Content } = await render(libro);
+const enlace = `/libros/${libro.id}/`;
+---
+
+<article class="destacado aparece">
+  <a class="tapa" href={enlace} tabindex="-1" aria-hidden="true">
+    <Portada libro={libro} decorativa ancho={480} />
+  </a>
+  <div class="texto">
+    <p class="dato">{COLECCIONES[libro.data.coleccion]} · {libro.data.anio}</p>
+    <h3><a href={enlace}>{libro.data.titulo}</a></h3>
+    <p class="autor">{libro.autor.data.nombre}</p>
+    <div class="sinopsis"><Content /></div>
+    <div class="acciones">
+      <a class="boton" href={enlace}>Conoce el libro <Icono nombre="flecha" /></a>
+      <a class="boton borde" href={enlaceWhatsApp(EDITORIAL.telefono, mensajePedido(libro))} target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" /> Pedir
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .destacado {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
+    gap: clamp(28px, 6vw, 88px);
+    align-items: center;
+    padding-bottom: clamp(40px, 6vw, 72px);
+    margin-bottom: clamp(40px, 6vw, 72px);
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .tapa {
+    display: block;
+    text-decoration: none;
+    max-width: 380px;
+    justify-self: end;
+    width: 100%;
+  }
+
+  .tapa :global(.portada) {
+    transition: transform 0.4s var(--ease);
+    transform: rotate(-2deg);
+  }
+
+  @media (hover: hover) {
+    .destacado:hover .tapa :global(.portada) {
+      transform: rotate(0) translateY(-6px);
+    }
+  }
+
+  .dato {
+    margin: 0;
+    color: var(--naranja-txt);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  h3 {
+    margin-top: 10px;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -0.025em;
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 6px;
+  }
+
+  .autor {
+    margin: 10px 0 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2vw, 24px);
+    color: var(--azul);
+  }
+
+  .sinopsis {
+    max-width: 52ch;
+    margin-top: 20px;
+    color: var(--gris);
+    font-size: 1.0625rem;
+  }
+
+  .sinopsis :global(p) {
+    margin: 0;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 760px) {
+    .destacado {
+      grid-template-columns: 1fr;
+    }
+
+    .tapa {
+      justify-self: start;
+      width: min(62%, 260px);
+    }
+  }
+</style>
