@@ -1,6 +1,6 @@
 /* Newsreader con tamaño óptico: fina en títulos grandes y firme en tamaños chicos. */
 @import '@fontsource-variable/newsreader/opsz.css';
-@import '@fontsource-variable/newsreader/opsz-italic.css';
+@import '@fontsource-variable/newsreader/wght-italic.css';
 @import '@fontsource-variable/inter/wght.css';
 
 :root {

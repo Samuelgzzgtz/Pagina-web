@@ -381,10 +381,10 @@ const anio = new Date().getFullYear();
     font-size: 0.875rem;
   }
 
-  /* Firma grande que asoma cortada al final de cada página. */
+  /* Firma grande apoyada en el borde inferior de cada página. */
   .pie-firma {
     grid-column: 1 / -1;
-    margin: clamp(24px, 4vw, 48px) 0 calc(-0.24 * clamp(120px, 27vw, 400px));
+    margin: clamp(24px, 4vw, 48px) 0 -0.24em;
     font-family: var(--serif);
     font-weight: 500;
     font-size: clamp(120px, 27vw, 400px);

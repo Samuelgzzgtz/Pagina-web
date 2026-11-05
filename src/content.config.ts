@@ -20,6 +20,7 @@ const libros = defineCollection({
       anio: z.number().int(),
       paginas: z.number().int().optional(),
       isbn: z.string().optional(),
+      // Las novedades salen en el abanico y la primera como libro destacado en Inicio.
       novedad: z.boolean().default(false),
     }),
 });

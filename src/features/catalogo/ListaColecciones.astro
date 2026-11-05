@@ -138,6 +138,11 @@ const titulos = (n: number) => (n === 1 ? '1 título' : `${n} títulos`);
   }
 
   @media (hover: none), (max-width: 640px) {
+    a {
+      grid-template-columns: 48px 1fr auto;
+      gap: 0;
+    }
+
     .lomos {
       display: none;
     }

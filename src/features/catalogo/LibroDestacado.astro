@@ -23,7 +23,7 @@ const enlace = `/libros/${libro.id}/`;
     <p class="dato">{COLECCIONES[libro.data.coleccion]} · {libro.data.anio}</p>
     <h3><a href={enlace}>{libro.data.titulo}</a></h3>
     <p class="autor">{libro.autor.data.nombre}</p>
-    <div class="sinopsis"><Content /></div>
+    <div class="prosa sinopsis"><Content /></div>
     <div class="acciones">
       <a class="boton" href={enlace}>Conoce el libro <Icono nombre="flecha" /></a>
       <a class="boton borde" href={enlaceWhatsApp(EDITORIAL.telefono, mensajePedido(libro))} target="_blank" rel="noopener">
@@ -98,18 +98,13 @@ const enlace = `/libros/${libro.id}/`;
     max-width: 52ch;
     margin-top: 20px;
     color: var(--gris);
-    font-size: 1.0625rem;
-  }
-
-  .sinopsis :global(p) {
-    margin: 0;
   }
 
   .acciones {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 28px;
+    margin-top: 12px;
   }
 
   @media (max-width: 760px) {
