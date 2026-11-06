@@ -1,0 +1,412 @@
+---
+import '../styles/global.css';
+import Icono from '../components/Icono.astro';
+import { EDITORIAL } from '../data/editorial';
+import { enlaceWhatsApp, formatearTelefono, enlaceLlamada } from '../data/telefono';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+}
+
+const { titulo, descripcion = EDITORIAL.descripcion } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} | Editorial DT5` : `Editorial DT5 | ${EDITORIAL.lema}`;
+
+const secciones = [
+  { href: '/', texto: 'Inicio' },
+  { href: '/catalogo/', texto: 'Catálogo' },
+  { href: '/autores/', texto: 'Autores' },
+  { href: '/colaboradores/', texto: 'Colaboradores' },
+  { href: '/nosotros/', texto: 'Nosotros' },
+  { href: '/publica/', texto: 'Publica' },
+  { href: '/contacto/', texto: 'Contacto' },
+];
+
+const ruta = Astro.url.pathname.replace(/\/?$/, '/');
+const actual = (href: string) =>
+  href === '/' ? ruta === '/' : ruta.startsWith(href) || (href === '/catalogo/' && ruta.startsWith('/libros/'));
+const anio = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#f6f1e7" />
+    <!-- Quitar cuando los libros, autores y teléfonos sean reales. -->
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script is:inline>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <header class="cabecera">
+      <a class="logo" href="/" aria-label="DT5, inicio">DT<b>5</b></a>
+      <nav aria-label="Principal">
+        <ul>
+          {
+            secciones.map((s) => (
+              <li>
+                <a href={s.href} aria-current={actual(s.href) ? 'page' : undefined}>
+                  {s.texto}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <button class="abrir-menu" type="button" aria-label="Abrir menú" aria-haspopup="dialog" data-abrir-menu>
+        <Icono nombre="menu" tamano={22} />
+      </button>
+    </header>
+
+    <dialog class="menu-movil" aria-label="Menú" data-menu>
+      <button class="cerrar-menu" type="button" aria-label="Cerrar menú" data-cerrar-menu>
+        <Icono nombre="cerrar" tamano={22} />
+      </button>
+      <nav aria-label="Menú móvil">
+        {
+          secciones.map((s, i) => (
+            <a href={s.href} style={`--i:${i}`} aria-current={actual(s.href) ? 'page' : undefined}>
+              {s.texto}
+            </a>
+          ))
+        }
+      </nav>
+      <p class="menu-contacto">
+        <a href={`mailto:${EDITORIAL.correo}`}>{EDITORIAL.correo}</a>
+        <a href={enlaceLlamada(EDITORIAL.telefono)}>{formatearTelefono(EDITORIAL.telefono)}</a>
+      </p>
+    </dialog>
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <footer class="pie">
+      <div class="pie-marca">
+        <a class="logo" href="/">DT<b>5</b></a>
+        <p>{EDITORIAL.lema}</p>
+        <p>{EDITORIAL.ciudad}</p>
+      </div>
+      <div>
+        <h2>Editorial</h2>
+        <ul>
+          {
+            secciones.slice(1, 6).map((s) => (
+              <li>
+                <a href={s.href}>{s.texto}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h2>Contacto</h2>
+        <ul>
+          <li><a href={`mailto:${EDITORIAL.correo}`}>{EDITORIAL.correo}</a></li>
+          <li><a href={enlaceLlamada(EDITORIAL.telefono)}>{formatearTelefono(EDITORIAL.telefono)}</a></li>
+          <li><a href={enlaceWhatsApp(EDITORIAL.telefono)} rel="noopener" target="_blank">WhatsApp</a></li>
+          <li><a href={EDITORIAL.redes.instagram} rel="noopener" target="_blank">Instagram</a></li>
+          <li><a href={EDITORIAL.redes.facebook} rel="noopener" target="_blank">Facebook</a></li>
+        </ul>
+      </div>
+      <p class="pie-legal">© {anio} Editorial DT5. <a href="/privacidad/">Aviso de privacidad</a></p>
+      <p class="pie-firma aparece" aria-hidden="true">DT<b>5</b></p>
+    </footer>
+
+    <script>
+      // Menú de celular: <dialog> ya atrapa el foco y cierra con Esc.
+      const menu = document.querySelector<HTMLDialogElement>('[data-menu]')!;
+      document.querySelector('[data-abrir-menu]')!.addEventListener('click', () => menu.showModal());
+      document.querySelector('[data-cerrar-menu]')!.addEventListener('click', () => menu.close());
+      menu.addEventListener('click', (e) => {
+        if (e.target === menu) menu.close();
+      });
+
+      // Muestra cada .aparece una sola vez al entrar en pantalla.
+      const observador = new IntersectionObserver(
+        (entradas) => {
+          for (const entrada of entradas) {
+            if (!entrada.isIntersecting) continue;
+            entrada.target.classList.add('visible');
+            observador.unobserve(entrada.target);
+          }
+        },
+        { threshold: 0.12 },
+      );
+      document.querySelectorAll('.aparece').forEach((el) => observador.observe(el));
+    </script>
+  </body>
+</html>
+
+<style>
+  .saltar {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 50;
+    background: var(--azul);
+    color: var(--blanco);
+    padding: 10px 16px;
+    border-radius: 8px;
+  }
+
+  .saltar:focus {
+    top: 12px;
+  }
+
+  .cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 68px;
+    padding: 8px var(--orilla);
+    background: #f6f1e7e6;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #1b2f6b1f;
+    animation: sombra linear both;
+    animation-timeline: scroll();
+    animation-range: 0 120px;
+  }
+
+  /* La sombra aparece al hacer scroll, sin JavaScript, en navegadores que lo soportan. */
+  @keyframes sombra {
+    to {
+      box-shadow: 0 8px 24px -16px #1b2f6b55;
+    }
+  }
+
+  .logo {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    color: var(--azul);
+    text-decoration: none;
+  }
+
+  .logo b {
+    color: var(--naranja);
+  }
+
+  .cabecera ul {
+    display: flex;
+    gap: clamp(14px, 2vw, 26px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cabecera nav a {
+    position: relative;
+    display: inline-block;
+    padding: 10px 0;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .cabecera nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    height: 1.5px;
+    background: var(--naranja);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s var(--ease);
+  }
+
+  .cabecera nav a:hover::after,
+  .cabecera nav a[aria-current]::after {
+    transform: scaleX(1);
+  }
+
+  .abrir-menu,
+  .cerrar-menu {
+    display: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--azul);
+    cursor: pointer;
+  }
+
+  .menu-movil {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 16px var(--margen) 32px;
+    border: 0;
+    background: var(--azul);
+    color: var(--blanco);
+    flex-direction: column;
+  }
+
+  .menu-movil[open] {
+    display: flex;
+    animation: abre 0.45s var(--ease);
+  }
+
+  @keyframes abre {
+    from {
+      clip-path: circle(0 at calc(100% - 40px) 34px);
+    }
+    to {
+      clip-path: circle(150% at calc(100% - 40px) 34px);
+    }
+  }
+
+  .menu-movil :focus-visible {
+    outline-color: var(--blanco);
+  }
+
+  .menu-movil::backdrop {
+    background: transparent;
+  }
+
+  .cerrar-menu {
+    display: grid;
+    align-self: flex-end;
+    color: var(--blanco);
+  }
+
+  .menu-movil nav {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+  }
+
+  .menu-movil nav a {
+    font-family: var(--serif);
+    font-size: clamp(32px, 9vw, 44px);
+    line-height: 1.35;
+    color: var(--blanco);
+    text-decoration: none;
+    animation: entra 0.4s var(--ease) both;
+    animation-delay: calc(80ms + var(--i) * 35ms);
+  }
+
+  .menu-movil nav a[aria-current] {
+    color: var(--naranja);
+  }
+
+  .menu-contacto {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0.85;
+  }
+
+  .menu-contacto a {
+    text-decoration: none;
+    padding: 6px 0;
+  }
+
+  @media (max-width: 900px) {
+    .cabecera nav {
+      display: none;
+    }
+
+    .abrir-menu {
+      display: grid;
+    }
+  }
+
+  .pie {
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 32px;
+    padding: 56px var(--orilla) 0;
+    border-top: 1px solid var(--linea);
+    color: var(--gris);
+    font-size: 0.9375rem;
+  }
+
+  .pie h2 {
+    font-family: var(--sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+  }
+
+  .pie ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pie li a,
+  .pie-legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+
+  .pie a:hover {
+    color: var(--azul);
+  }
+
+  .pie-marca p {
+    margin: 6px 0 0;
+  }
+
+  .pie-legal {
+    grid-column: 1 / -1;
+    margin: 16px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid #1b2f6b1a;
+    font-size: 0.875rem;
+  }
+
+  /* Firma grande apoyada en el borde inferior de cada página. */
+  .pie-firma {
+    grid-column: 1 / -1;
+    margin: clamp(24px, 4vw, 48px) 0 -0.24em;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(120px, 27vw, 400px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--azul);
+    text-align: center;
+    user-select: none;
+  }
+
+  .pie-firma b {
+    color: var(--naranja);
+    font-weight: inherit;
+  }
+
+  @media (max-width: 640px) {
+    .pie {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .pie-marca {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

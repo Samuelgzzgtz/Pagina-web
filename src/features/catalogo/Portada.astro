@@ -1,0 +1,143 @@
+---
+import { Image } from 'astro:assets';
+import { COLECCIONES } from '../../data/editorial';
+import type { Libro } from './libros';
+
+interface Props {
+  libro: Libro;
+  // El mismo nombre en la lista y en la ficha hace que la portada "viaje" entre páginas.
+  // Debe ser único por página, así que se apaga en portadas repetidas.
+  transicion?: boolean;
+  ancho?: number;
+  // Dentro de un enlace que ya dice el título, para que el lector de pantalla no lo repita.
+  decorativa?: boolean;
+  class?: string;
+}
+
+const { libro, transicion = true, ancho = 320, decorativa = false, class: clase } = Astro.props;
+const { titulo, coleccion, color, portada } = libro.data;
+const nombre = transicion ? `portada-${libro.id}` : undefined;
+---
+
+{
+  portada ? (
+    <Image
+      class:list={['portada', 'foto', clase]}
+      src={portada}
+      alt={decorativa ? '' : `Portada de ${titulo}`}
+      width={ancho}
+      style={nombre && `view-transition-name:${nombre}`}
+    />
+  ) : (
+    <div
+      class:list={['portada', color, clase]}
+      style={nombre && `view-transition-name:${nombre}`}
+      role={decorativa ? undefined : 'img'}
+      aria-label={decorativa ? undefined : `Portada de ${titulo}`}
+      aria-hidden={decorativa ? 'true' : undefined}
+    >
+      <div class="cara">
+        <small>{COLECCIONES[coleccion]}</small>
+        <span class="titulo">{titulo}</span>
+        <span class="pie">
+          <span class="autor">{libro.autor.data.nombre}</span>
+          <span class="sello">
+            DT<b>5</b>
+          </span>
+        </span>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .portada {
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    border-radius: 2px 6px 6px 2px;
+    box-shadow:
+      0 18px 30px -14px #1b2f6b66,
+      inset 6px 0 0 #0000001a;
+    container-type: inline-size;
+  }
+
+  .foto {
+    object-fit: cover;
+  }
+
+  div.portada {
+    overflow: hidden;
+  }
+
+  /* Las medidas en cqi siguen el ancho de la portada, así se ve igual chica o grande. */
+  .cara {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 9cqi 8cqi;
+  }
+
+  small {
+    font-size: max(10px, 6cqi);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  .titulo {
+    font-family: var(--serif);
+    font-size: 13cqi;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: max(10px, 6cqi);
+  }
+
+  .autor {
+    opacity: 0.85;
+  }
+
+  .sello {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: max(11px, 8cqi);
+  }
+
+  .azul {
+    background: var(--azul);
+    color: var(--blanco);
+  }
+
+  .cielo {
+    background: var(--azul-2);
+    color: var(--blanco);
+  }
+
+  .naranja {
+    background: var(--naranja);
+    color: var(--tinta);
+  }
+
+  .blanco {
+    background: var(--blanco);
+    color: var(--azul);
+  }
+
+  .azul .sello b,
+  .cielo .sello b,
+  .blanco .sello b {
+    color: var(--naranja);
+  }
+
+  .naranja .sello b {
+    color: var(--blanco);
+  }
+</style>

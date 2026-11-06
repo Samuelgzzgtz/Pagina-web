@@ -1,0 +1,340 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import Portada from '../features/catalogo/Portada.astro';
+import ListaLibros from '../features/catalogo/ListaLibros.astro';
+import ListaColecciones from '../features/catalogo/ListaColecciones.astro';
+import LibroDestacado from '../features/catalogo/LibroDestacado.astro';
+import { obtenerLibros } from '../features/catalogo/libros';
+import MapaColaboradores from '../features/colaboradores/MapaColaboradores.astro';
+import { EDITORIAL } from '../data/editorial';
+
+const libros = await obtenerLibros();
+const novedades = libros.filter((l) => l.data.novedad);
+const [destacado] = novedades;
+const recientes = libros.filter((l) => l !== destacado).slice(0, 4);
+const autores = (await getCollection('autores')).sort((a, b) => a.data.nombre.localeCompare(b.data.nombre, 'es'));
+const estadosConColaborador = new Set((await getCollection('colaboradores')).map((c) => c.data.estado)).size;
+
+const cifras = [
+  { valor: libros.length, texto: 'títulos' },
+  { valor: estadosConColaborador, texto: 'estados con colaborador' },
+  { valor: new Date().getFullYear() - EDITORIAL.fundacion, texto: 'años' },
+];
+---
+
+<Base>
+  <section class="portada-inicio">
+    <div>
+      <h1>
+        <span class="linea"><span>Libros que</span></span>
+        <span class="linea"><span>se quedan</span></span>
+        <span class="linea"><span><em>contigo.</em></span></span>
+      </h1>
+      <p class="lead">{EDITORIAL.descripcion}</p>
+      <div class="acciones">
+        <a class="boton" href="/catalogo/">Ver catálogo <Icono nombre="flecha" /></a>
+        <a class="enlace subrayado" href="#red">Encuentra a tu colaborador</a>
+      </div>
+    </div>
+    <div class="abanico" aria-hidden="true">
+      {novedades.slice(0, 3).map((libro) => <Portada libro={libro} transicion={false} />)}
+    </div>
+  </section>
+
+  <section class="franja">
+    <div class="encabezado">
+      <h2 class="titulo-seccion">Lo más reciente</h2>
+      <a class="enlace" href="/catalogo/">Todo el catálogo <Icono nombre="flecha" tamano={16} /></a>
+    </div>
+    {destacado && <LibroDestacado libro={destacado} />}
+    <ListaLibros libros={recientes} fila />
+  </section>
+
+  <section class="franja sin-arriba">
+    <div class="encabezado">
+      <h2 class="titulo-seccion">Colecciones</h2>
+    </div>
+    <ListaColecciones libros={libros} />
+  </section>
+
+  <section class="banda">
+    <blockquote class="aparece">“Publicamos los libros que <em>nos hubiera gustado leer</em> primero.”</blockquote>
+    <dl class="cifras aparece">
+      {
+        cifras.map((c) => (
+          <div>
+            <dt>{c.texto}</dt>
+            <dd data-contar={c.valor}>{c.valor}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="franja" id="red">
+    <MapaColaboradores />
+  </section>
+
+  <section class="franja sin-arriba">
+    <div class="encabezado">
+      <h2 class="titulo-seccion">Autores</h2>
+      <a class="enlace" href="/autores/">Conócelos <Icono nombre="flecha" tamano={16} /></a>
+    </div>
+    <p class="nombres aparece">
+      {autores.map((a) => <a href={`/autores/${a.id}/`}>{a.data.nombre}</a>)}
+    </p>
+  </section>
+
+  <section class="franja llamado">
+    <div>
+      <h2 class="titulo-seccion">¿Tienes un manuscrito?</h2>
+      <p>Leemos todas las propuestas. Te respondemos en un máximo de 8 semanas.</p>
+    </div>
+    <a class="boton" href="/publica/">Envía tu obra <Icono nombre="flecha" /></a>
+  </section>
+</Base>
+
+<script>
+  // Las cifras cuentan desde cero la primera vez que se ven. Sin movimiento reducido.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const cifras = document.querySelectorAll<HTMLElement>('[data-contar]');
+    const observador = new IntersectionObserver((entradas) => {
+      for (const { target, isIntersecting } of entradas) {
+        if (!isIntersecting) continue;
+        observador.unobserve(target);
+        const meta = Number((target as HTMLElement).dataset.contar);
+        const inicio = performance.now();
+        const paso = (ahora: number) => {
+          const avance = Math.min((ahora - inicio) / 1100, 1);
+          target.textContent = String(Math.round(meta * (1 - (1 - avance) ** 3)));
+          if (avance < 1) requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
+      }
+    });
+    cifras.forEach((c) => observador.observe(c));
+  }
+</script>
+
+<style>
+  .portada-inicio {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: clamp(36px, 8vw, 96px) var(--orilla) clamp(28px, 6vw, 72px);
+  }
+
+  h1 {
+    font-size: clamp(44px, 7.4vw, 96px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  h1 em {
+    color: var(--naranja-txt);
+  }
+
+  .linea {
+    display: block;
+    overflow: hidden;
+    /* Deja espacio a la "g" de "contigo" para que no se corte. */
+    padding-bottom: 0.14em;
+    margin-bottom: -0.14em;
+  }
+
+  .linea > span {
+    display: inline-block;
+    animation: sube 0.9s var(--ease) both;
+  }
+
+  .linea:nth-child(2) > span {
+    animation-delay: 0.08s;
+  }
+
+  .linea:nth-child(3) > span {
+    animation-delay: 0.16s;
+  }
+
+  .portada-inicio .lead {
+    margin: 20px 0 28px;
+    font-size: 1.0625rem;
+    animation: entra 0.8s 0.3s var(--ease) both;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+    animation: entra 0.8s 0.4s var(--ease) both;
+  }
+
+  .subrayado {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  .abanico {
+    position: relative;
+    width: min(100%, 420px);
+    aspect-ratio: 1.3;
+    justify-self: center;
+  }
+
+  .abanico :global(.portada) {
+    position: absolute;
+    width: 46%;
+    animation: reparte 0.9s var(--ease) both;
+    transition: transform 0.35s var(--ease);
+    transform: rotate(var(--giro));
+  }
+
+  .abanico :global(.portada:nth-child(1)) {
+    left: 0;
+    top: 16%;
+    --giro: -9deg;
+    animation-delay: 0.2s;
+  }
+
+  .abanico :global(.portada:nth-child(2)) {
+    left: 27%;
+    top: 4%;
+    --giro: 2deg;
+    z-index: 1;
+    animation-delay: 0.3s;
+  }
+
+  .abanico :global(.portada:nth-child(3)) {
+    left: 54%;
+    top: 19%;
+    --giro: 10deg;
+    animation-delay: 0.4s;
+  }
+
+  @media (hover: hover) {
+    .abanico:hover :global(.portada:nth-child(1)) {
+      transform: rotate(-14deg) translateX(-14px);
+    }
+
+    .abanico:hover :global(.portada:nth-child(3)) {
+      transform: rotate(15deg) translateX(14px);
+    }
+  }
+
+  @keyframes reparte {
+    from {
+      opacity: 0;
+      transform: translateY(40px) rotate(0);
+    }
+  }
+
+  .sin-arriba {
+    padding-top: 0;
+  }
+
+  .banda {
+    padding: clamp(48px, 8vw, 88px) var(--orilla);
+    background: var(--azul);
+    color: var(--blanco);
+  }
+
+  blockquote {
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--serif);
+    font-size: clamp(26px, 3.6vw, 44px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  blockquote em {
+    color: var(--naranja);
+  }
+
+  .cifras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px clamp(28px, 5vw, 64px);
+    margin: 36px 0 0;
+  }
+
+  .cifras div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .cifras dd {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(36px, 4.4vw, 52px);
+    line-height: 1;
+    color: var(--naranja);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cifras dt {
+    margin-top: 6px;
+    font-size: 0.9375rem;
+    opacity: 0.85;
+  }
+
+  .nombres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px clamp(20px, 3vw, 36px);
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.6vw, 32px);
+    line-height: 1.6;
+    color: var(--azul);
+  }
+
+  .nombres a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nombres a:hover {
+    color: var(--naranja-txt);
+  }
+
+  .llamado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    background: var(--naranja);
+    color: var(--tinta);
+  }
+
+  .llamado h2 {
+    color: var(--tinta);
+  }
+
+  .llamado p {
+    margin: 8px 0 0;
+  }
+
+  @media (max-width: 760px) {
+    .portada-inicio {
+      grid-template-columns: 1fr;
+    }
+
+    .abanico {
+      width: min(86%, 340px);
+      justify-self: start;
+    }
+
+    .llamado {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

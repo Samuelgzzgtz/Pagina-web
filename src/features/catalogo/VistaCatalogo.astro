@@ -1,0 +1,88 @@
+---
+import Base from '../../layouts/Base.astro';
+import ListaLibros from './ListaLibros.astro';
+import { obtenerLibros } from './libros';
+import { COLECCIONES, type Coleccion } from '../../data/editorial';
+
+interface Props {
+  // Sin colección se muestran todos los libros.
+  coleccion?: Coleccion;
+}
+
+const { coleccion } = Astro.props;
+const todos = await obtenerLibros();
+const libros = coleccion ? todos.filter((l) => l.data.coleccion === coleccion) : todos;
+const filtros = [
+  { href: '/catalogo/', texto: 'Todos', activo: !coleccion },
+  ...(Object.entries(COLECCIONES) as [Coleccion, string][]).map(([clave, texto]) => ({
+    href: `/catalogo/${clave}/`,
+    texto,
+    activo: clave === coleccion,
+  })),
+];
+const titulo = coleccion ? COLECCIONES[coleccion] : 'Catálogo';
+---
+
+<Base titulo={titulo} descripcion={`${titulo} de Editorial DT5: ${libros.length} títulos.`}>
+  <section class="franja">
+    <h1>{titulo}</h1>
+    <nav class="filtros" aria-label="Colecciones">
+      {
+        filtros.map((f) => (
+          <a href={f.href} aria-current={f.activo ? 'page' : undefined}>
+            {f.texto}
+          </a>
+        ))
+      }
+    </nav>
+    <ListaLibros libros={libros} />
+  </section>
+</Base>
+
+<style>
+  h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: -0.03em;
+  }
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 clamp(18px, 3vw, 32px);
+    margin: 20px 0 clamp(28px, 4vw, 44px);
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .filtros a {
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    color: var(--gris);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .filtros a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--naranja);
+    transform: scaleX(0);
+    transition: transform 0.25s var(--ease);
+  }
+
+  .filtros a:hover,
+  .filtros a[aria-current] {
+    color: var(--azul);
+  }
+
+  .filtros a[aria-current]::after {
+    transform: none;
+  }
+</style>

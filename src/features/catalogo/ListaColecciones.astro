@@ -1,0 +1,155 @@
+---
+import { COLECCIONES, type Coleccion } from '../../data/editorial';
+import type { Libro } from './libros';
+
+interface Props {
+  libros: Libro[];
+}
+
+const { libros } = Astro.props;
+const colecciones = Object.entries(COLECCIONES) as [Coleccion, string][];
+const titulos = (n: number) => (n === 1 ? '1 título' : `${n} títulos`);
+---
+
+<ul class="colecciones aparece">
+  {
+    colecciones.map(([clave, nombre], i) => {
+      const deLaColeccion = libros.filter((l) => l.data.coleccion === clave);
+      return (
+        <li>
+          <a href={`/catalogo/${clave}/`}>
+            <span class="numero">{String(i + 1).padStart(2, '0')}</span>
+            <span class="nombre">{nombre}</span>
+            <span class="lomos" aria-hidden="true">
+              {deLaColeccion.slice(0, 5).map((l, j) => (
+                <i class={l.data.color} style={`--j:${j};height:${34 + (j % 3) * 5}px`} />
+              ))}
+            </span>
+            <span class="cuantos">{titulos(deLaColeccion.length)}</span>
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .colecciones {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--linea);
+  }
+
+  a {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px 1fr auto auto;
+    gap: 0 24px;
+    align-items: center;
+    padding: 18px 14px;
+    border-bottom: 1px solid var(--linea);
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  /* Al pasar el cursor, la fila se llena de azul desde abajo. */
+  a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--azul);
+    transform: translateY(101%);
+    transition: transform 0.35s var(--ease);
+  }
+
+  a:hover::before,
+  a:focus-visible::before {
+    transform: none;
+  }
+
+  a > span {
+    position: relative;
+    transition: color 0.25s;
+  }
+
+  a:hover > span,
+  a:focus-visible > span {
+    color: var(--blanco);
+  }
+
+  .numero {
+    color: var(--naranja-txt);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a:hover .numero,
+  a:focus-visible .numero {
+    color: var(--naranja);
+  }
+
+  .nombre {
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.6vw, 30px);
+    color: var(--azul);
+  }
+
+  /* Al pasar el cursor asoman los lomos de los libros de la colección. */
+  .lomos {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 44px;
+  }
+
+  .lomos i {
+    width: 12px;
+    border-radius: 2px 2px 1px 1px;
+    box-shadow: inset -2px 0 0 #00000014;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.4s var(--ease);
+    transition-delay: calc(var(--j) * 40ms);
+  }
+
+  a:hover .lomos i,
+  a:focus-visible .lomos i {
+    opacity: 1;
+    transform: none;
+  }
+
+  .lomos .azul {
+    background: var(--papel);
+  }
+
+  .lomos .cielo {
+    background: #c9d4f2;
+  }
+
+  .lomos .naranja {
+    background: var(--naranja);
+  }
+
+  .lomos .blanco {
+    background: var(--blanco);
+  }
+
+  @media (hover: none), (max-width: 640px) {
+    a {
+      grid-template-columns: 48px 1fr auto;
+      gap: 0;
+    }
+
+    .lomos {
+      display: none;
+    }
+  }
+
+  .cuantos {
+    color: var(--gris);
+    font-size: 0.875rem;
+  }
+</style>

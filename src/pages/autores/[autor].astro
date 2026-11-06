@@ -1,0 +1,76 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icono from '../../components/Icono.astro';
+import ListaLibros from '../../features/catalogo/ListaLibros.astro';
+import { obtenerLibros, type Libro } from '../../features/catalogo/libros';
+
+export async function getStaticPaths() {
+  const [autores, libros] = await Promise.all([getCollection('autores'), obtenerLibros()]);
+  return autores.map((autor) => ({
+    params: { autor: autor.id },
+    props: { autor, libros: libros.filter((l) => l.autor.id === autor.id) },
+  }));
+}
+
+interface Props {
+  autor: CollectionEntry<'autores'>;
+  libros: Libro[];
+}
+
+const { autor, libros } = Astro.props;
+const { Content } = await render(autor);
+---
+
+<Base titulo={autor.data.nombre} descripcion={`${autor.data.nombre} publica con Editorial DT5.`}>
+  <section class="franja">
+    <a class="volver" href="/autores/"><Icono nombre="atras" tamano={16} /> Todos los autores</a>
+    <h1>{autor.data.nombre}</h1>
+    {autor.data.ciudad && <p class="ciudad">{autor.data.ciudad}</p>}
+    <div class="prosa bio"><Content /></div>
+  </section>
+
+  <section class="franja sin-arriba">
+    <h2 class="titulo-seccion libros">{libros.length === 1 ? 'Su libro' : 'Sus libros'}</h2>
+    <ListaLibros libros={libros} />
+  </section>
+</Base>
+
+<style>
+  .volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    color: var(--naranja-txt);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  h1 {
+    margin-top: 2px;
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: -0.03em;
+  }
+
+  .ciudad {
+    margin: 8px 0 0;
+    color: var(--gris);
+  }
+
+  .bio {
+    margin-top: 28px;
+    font-family: var(--serif);
+    font-size: clamp(20px, 2vw, 24px);
+    line-height: 1.5;
+  }
+
+  .sin-arriba {
+    padding-top: 0;
+  }
+
+  .libros {
+    margin-bottom: 28px;
+  }
+</style>
