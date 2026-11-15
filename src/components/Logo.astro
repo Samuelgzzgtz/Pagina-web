@@ -1,0 +1,66 @@
+---
+// Logotipo DT5: libro abierto de dos tonos y el nombre. `claro` es la versión para fondos azules.
+interface Props {
+  claro?: boolean;
+  tamano?: number;
+}
+
+const { claro = false, tamano = 30 } = Astro.props;
+---
+
+<span class:list={['logo-dt5', { claro }]}>
+  <svg width={tamano} height={tamano} viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+    <path class="izq" d="M5 10 18 13.5v18L5 28Z"></path>
+    <path class="der" d="M22 13.5 35 10v18l-13 3.5Z"></path>
+  </svg>
+  <span class="nombre">DT<b>5</b></span>
+</span>
+
+<style>
+  .logo-dt5 {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--azul);
+  }
+
+  .claro {
+    color: var(--blanco);
+  }
+
+  svg {
+    flex: none;
+  }
+
+  path {
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+
+  .izq {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  .der {
+    fill: var(--naranja);
+    stroke: var(--naranja);
+  }
+
+  .nombre {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .nombre b {
+    font-weight: inherit;
+    color: var(--naranja);
+  }
+
+  .claro .nombre b {
+    color: var(--naranja-claro);
+  }
+</style>

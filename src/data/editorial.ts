@@ -4,7 +4,9 @@ export const EDITORIAL = {
   descripcion: 'Narrativa, ensayo, poesía y libros infantiles hechos en México.',
   correo: 'contacto@dt5.mx',
   telefono: '8100000000',
+  // Dirección de la oficina: solo se muestra en Contacto, no como parte de la marca.
   ciudad: 'Monterrey, Nuevo León',
+  cobertura: 'Atención a todo México',
   fundacion: 2010,
   redes: {
     instagram: 'https://instagram.com/',

@@ -1,22 +1,24 @@
-/* Newsreader con tamaño óptico: fina en títulos grandes y firme en tamaños chicos. */
-@import '@fontsource-variable/newsreader/opsz.css';
-@import '@fontsource-variable/newsreader/opsz-italic.css';
-@import '@fontsource-variable/inter/wght.css';
+/* Fraunces con tamaño óptico: fina en títulos grandes y firme en tamaños chicos. */
+@import '@fontsource-variable/fraunces/opsz.css';
+@import '@fontsource-variable/fraunces/opsz-italic.css';
+@import '@fontsource-variable/figtree/wght.css';
 
 :root {
-  --azul: #1b2f6b;
-  --azul-2: #2a47a0;
-  --naranja: #f2661f;
+  --azul: #1b3f8f;
+  --azul-2: #2563eb;
+  --naranja: #f97316;
   /* Naranja para texto chico sobre papel: el de marca no llega a 4.5:1 de contraste. */
   --naranja-txt: #c2410c;
-  --papel: #f6f1e7;
+  --papel: #fbf7f1;
   --blanco: #fff;
-  --tinta: #141b2e;
-  --gris: #5b6275;
-  --linea: #1b2f6b33;
+  --tinta: #1a1f2e;
+  --gris: #5b5f6b;
+  --linea: #1b3f8f33;
   --sin: #c9d0e3;
-  --serif: 'Newsreader Variable', Georgia, serif;
-  --sans: 'Inter Variable', system-ui, sans-serif;
+  /* Naranja para texto sobre azul: más claro, para que se lea. */
+  --naranja-claro: #fb923c;
+  --serif: 'Fraunces Variable', Georgia, serif;
+  --sans: 'Figtree Variable', system-ui, sans-serif;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ancho: 1200px;
   --margen: clamp(20px, 4vw, 32px);
@@ -53,8 +55,8 @@ h2,
 h3,
 h4 {
   font-family: var(--serif);
-  font-weight: 400;
-  letter-spacing: -0.015em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1.08;
   color: var(--azul);
   margin: 0;
@@ -63,6 +65,13 @@ h4 {
 
 p {
   text-wrap: pretty;
+}
+
+/* La palabra de acento va en naranja y derecha, igual en todos los materiales de DT5. */
+h1 em,
+h2 em,
+blockquote em {
+  font-style: normal;
 }
 
 a {
@@ -143,11 +152,11 @@ img {
 .boton.borde {
   background: transparent;
   color: var(--azul);
-  box-shadow: inset 0 0 0 1.5px #1b2f6b55;
+  box-shadow: inset 0 0 0 1.5px #1b3f8f55;
 }
 
 .boton.borde:hover {
-  background: #1b2f6b0d;
+  background: #1b3f8f0d;
   box-shadow: inset 0 0 0 1.5px var(--azul);
 }
 
