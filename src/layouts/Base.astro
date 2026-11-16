@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Icono from '../components/Icono.astro';
+import Logo from '../components/Logo.astro';
 import { EDITORIAL } from '../data/editorial';
 import { enlaceWhatsApp, formatearTelefono, enlaceLlamada } from '../data/telefono';
 
@@ -38,7 +39,7 @@ const anio = new Date().getFullYear();
     <meta property="og:title" content={tituloCompleto} />
     <meta property="og:description" content={descripcion} />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#f6f1e7" />
+    <meta name="theme-color" content="#fbf7f1" />
     <!-- Quitar cuando los libros, autores y teléfonos sean reales. -->
     <meta name="robots" content="noindex" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -48,7 +49,7 @@ const anio = new Date().getFullYear();
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
     <header class="cabecera">
-      <a class="logo" href="/" aria-label="DT5, inicio">DT<b>5</b></a>
+      <a class="logo" href="/" aria-label="DT5, inicio"><Logo /></a>
       <nav aria-label="Principal">
         <ul>
           {
@@ -92,9 +93,9 @@ const anio = new Date().getFullYear();
 
     <footer class="pie">
       <div class="pie-marca">
-        <a class="logo" href="/">DT<b>5</b></a>
+        <a class="logo" href="/" aria-label="DT5, inicio"><Logo /></a>
         <p>{EDITORIAL.lema}</p>
-        <p>{EDITORIAL.ciudad}</p>
+        <p>{EDITORIAL.cobertura}</p>
       </div>
       <div>
         <h2>Editorial</h2>
@@ -173,9 +174,9 @@ const anio = new Date().getFullYear();
     gap: 16px;
     min-height: 68px;
     padding: 8px var(--orilla);
-    background: #f6f1e7e6;
+    background: #fbf7f1e6;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #1b2f6b1f;
+    border-bottom: 1px solid #1b3f8f1f;
     animation: sombra linear both;
     animation-timeline: scroll();
     animation-range: 0 120px;
@@ -184,21 +185,15 @@ const anio = new Date().getFullYear();
   /* La sombra aparece al hacer scroll, sin JavaScript, en navegadores que lo soportan. */
   @keyframes sombra {
     to {
-      box-shadow: 0 8px 24px -16px #1b2f6b55;
+      box-shadow: 0 8px 24px -16px #1b3f8f55;
     }
   }
 
   .logo {
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 26px;
-    letter-spacing: -0.02em;
-    color: var(--azul);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     text-decoration: none;
-  }
-
-  .logo b {
-    color: var(--naranja);
   }
 
   .cabecera ul {
@@ -306,7 +301,7 @@ const anio = new Date().getFullYear();
   }
 
   .menu-movil nav a[aria-current] {
-    color: var(--naranja);
+    color: var(--naranja-claro);
   }
 
   .menu-contacto {
@@ -377,7 +372,7 @@ const anio = new Date().getFullYear();
     grid-column: 1 / -1;
     margin: 16px 0 0;
     padding-top: 20px;
-    border-top: 1px solid #1b2f6b1a;
+    border-top: 1px solid #1b3f8f1a;
     font-size: 0.875rem;
   }
 
@@ -386,7 +381,7 @@ const anio = new Date().getFullYear();
     grid-column: 1 / -1;
     margin: clamp(24px, 4vw, 48px) 0 -0.24em;
     font-family: var(--serif);
-    font-weight: 500;
+    font-weight: 700;
     font-size: clamp(120px, 27vw, 400px);
     line-height: 1;
     letter-spacing: -0.05em;

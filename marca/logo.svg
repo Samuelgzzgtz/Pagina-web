@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 40" role="img" aria-label="DT5">
+  <g stroke-width="2.5" stroke-linejoin="round">
+    <path d="M5 10 18 13.5v18L5 28Z" fill="#1b3f8f" stroke="#1b3f8f"/>
+    <path d="M22 13.5 35 10v18l-13 3.5Z" fill="#f97316" stroke="#f97316"/>
+  </g>
+  <text x="48" y="31" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="32" letter-spacing="-.6" fill="#1b3f8f">DT<tspan fill="#f97316">5</tspan></text>
+</svg>
